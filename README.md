@@ -15,19 +15,20 @@ Streamlit-приложение для общения с содержимым PDF
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
-pip install streamlit python-dotenv PyPDF2 langchain-text-splitters langchain-openai langchain-community langchain-classic faiss-cpu
+pip install -r requirements.txt
 ```
 
-Создайте файл `.env` в корне проекта и добавьте ключ OpenAI:
-
-```
-OPENAI_API_KEY=your_api_key_here
-```
-
-## Запуск
+## Запуск локально
 
 ```bash
 streamlit run app.py
 ```
 
-После запуска откройте ссылку в браузере, загрузите PDF-файлы в боковой панели, нажмите "Process" и задавайте вопросы по содержимому документов.
+После запуска откройте ссылку в браузере, введите свой OpenAI API-ключ в боковой панели, загрузите PDF-файлы, нажмите "Process" и задавайте вопросы по содержимому документов.
+
+Ключ можно не вводить вручную каждый раз — для локальной разработки создайте файл `.env` в корне проекта:
+
+```
+OPENAI_API_KEY=your_api_key_here
+```
+

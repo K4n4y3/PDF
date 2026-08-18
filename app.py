@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
@@ -30,13 +31,13 @@ def get_text_chunks(text):
 
 
 def get_vectorstore(text_chunks):
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(api_key=st.session_state.openai_api_key)
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
     return vectorstore
 
 
 def get_conversation_chain(vectorstore):
-    llm = ChatOpenAI()
+    llm = ChatOpenAI(api_key=st.session_state.openai_api_key)
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
@@ -67,6 +68,8 @@ def main():
         st.session_state.conversation = None
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = None
+    if "openai_api_key" not in st.session_state:
+        st.session_state.openai_api_key = os.environ.get("OPENAI_API_KEY", "")
 
     st.header("Chat with Pdfs :books:")
     user_question = st.text_input("Ask a question about your PDF file:")
@@ -74,9 +77,16 @@ def main():
         handle_userinput(user_question)
 
     with st.sidebar:
+        st.subheader("OpenAI API key")
+        st.session_state.openai_api_key = st.text_input(
+            "Enter your OpenAI API key:",
+            value=st.session_state.openai_api_key,
+            type="password",
+        )
+
         st.subheader("Your documents")
         pdf_docs = st.file_uploader("Upload your PDF files here and click on process", type="pdf", accept_multiple_files=True)
-        if st.button("Process"):
+        if st.button("Process", disabled=not st.session_state.openai_api_key):
             with st.spinner("Processing"):
                 raw_text = get_pdf_text(pdf_docs)
 
